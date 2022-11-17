@@ -14,7 +14,6 @@ def cursos(request):
 
     return render(request, "appcoder/cursos.html")
     
-
 def creacion_curso(request):
 
     if request.method == "POST":
@@ -26,10 +25,8 @@ def creacion_curso(request):
 
     return render(request, "appcoder/curso_formulario.html")
 
-
 def estudiantes(request):
     return render(request, "appcoder/estudiantes.html")
-
 
 def creacion_estudiantes(request):
 
@@ -47,11 +44,8 @@ def creacion_estudiantes(request):
     formulario = EstudianteFormulario()
     return render(request, "appcoder/estudiantes_formulario.html", {"formulario": formulario})
 
-
 def profesores(request):
     return render(request, "appcoder/profesores.html")
-
-
 
 def creacion_profesores(request):
 
@@ -67,16 +61,9 @@ def creacion_profesores(request):
 
             profesor.save()
 
-
     formulario = ProfesorFormulario()    
     contexto = {"formulario": formulario}
     return render(request, "appcoder/profesores_formularios.html", contexto)
-
-
-
-
-
-
 
 def buscar_curso(request):
 
@@ -87,10 +74,6 @@ def resultados_busqueda_cursos(request):
 
     cursos = Curso.objects.filter(nombre__icontains=nombre_curso)
     return render(request, "appcoder/resultados_busquedas_cursos.html", {"cursos": cursos})
-
-
-
-
 
 def buscar_alumnos(request):
 
@@ -104,23 +87,9 @@ def buscar_alumnos(request):
 
     return render(request, "appcoder/busqueda_estudiantes.html", {"listado_alumnos": []})
 
-
-
-
 def entregables(request):
     return render(request, "appcoder/entregables.html")
 
-
-# def listado_cursos(request):
-#     cursos = Curso.objects.all()
-
-#     # Respuesta casera
-#     cadena_respuesta = "<ul>"
-#     for curso in cursos:
-#         cadena_respuesta += f"<li>({curso.nombre},{curso.camada}) </li>"
-#     cadena_respuesta += "</ul>"
-
-#     return HttpResponse(cadena_respuesta)
 
 def test(request):
     ruta = os.path.join(BASE_DIR, "appcoder/templates/appcoder/base.html")
