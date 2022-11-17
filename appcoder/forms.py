@@ -14,3 +14,7 @@ class EstudianteFormulario(forms.Form):
     nombre = forms.CharField(min_length=3,max_length=50)
     apellido = forms.CharField(min_length=3,max_length=50)
     email = forms.EmailField()
+
+class CursoFormulario(forms.Form):
+    nombre = forms.CharField(min_length=3)
+    camada = forms.IntegerField()

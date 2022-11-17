@@ -1,30 +1,73 @@
 from django.http import HttpResponse
-from appcoder.models import Curso, Profesor, Estudiante
-from appcoder.forms import ProfesorFormulario, EstudianteFormulario
-from django.shortcuts import render
+from appcoder.models import Curso, Profesor, Estudiante, Entregable
+from appcoder.forms import ProfesorFormulario, EstudianteFormulario, CursoFormulario
+from django.shortcuts import render, redirect
 
 
 # Dependencias para resolver apertura de archivos usando rutas relativas
 from proyectocoder.settings import BASE_DIR
 import os
 
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+
 def inicio(request):
     return render(request, "appcoder/index.html")
 
 def cursos(request):
 
-    return render(request, "appcoder/cursos.html")
+    errores = ""
+
+    #Validamos tipo de petición
+    if request.method == 'POST':
+        #Cargamos los datos en el formulario
+        formulario = CursoFormulario(request.POST)
+
+        #Validamos los datos
+        if formulario.is_valid():
+            #Recuperamos los datos sanitizados
+            data = formulario.cleaned_data
+            #Creamos el curso
+            curso = Curso(nombre=data["nombre"], camada=data["camada"])
+            #Guardamos el curso
+            curso.save()
+        else:
+            #si el formulario no es valido, guardamos los errores para mostrarlos
+            errores = formulario.errors
+
+    #Recuperar todos los cursos de la BD
+    cursos = Curso.objects.all() #Obtener todos los registros de ese modelo
+    #Creamos el formulario vacío
+    formulario = CursoFormulario()
+    #Creamos el contexto
+    contexto = {"listado_cursos": cursos, "formulario": formulario, "errores": errores}
+    #Retornamos la respuesta
+    return render(request, "appcoder/cursos.html", contexto)
+
+def editar_curso(request, id):
+    curso = Curso.objects.get(id=id)
+
+    if request.method == 'POST':
+        formulario = CursoFormulario(request.POST)
     
-def creacion_curso(request):
+        if formulario.is_valid():
+            data = formulario.cleaned_data
 
-    if request.method == "POST":
-        nombre_curso = request.POST["curso"]
-        numero_camada = request.POST["camada"]
+            curso.nombre = data["nombre"]
+            curso.camada = data["camada"]
+            curso.save()
+            return redirect("coder-cursos")
+        else:
+            return render(request, "appcoder/editar_curso.html", {"formulario": formulario, "errores": formulario.errors})
+    else:
+        formulario = CursoFormulario(initial={"nombre":curso.nombre, "camada":curso.camada})
+        return render(request, "appcoder/editar_curso.html", {"formulario": formulario, "errores": ""})
 
-        curso = Curso(nombre=nombre_curso, camada=numero_camada)
-        curso.save()
 
-    return render(request, "appcoder/curso_formulario.html")
+def eliminar_curso(request, id):
+    curso = Curso.objects.get(id=id)
+    curso.delete()
+
+    return redirect("coder-cursos")
 
 def estudiantes(request):
     return render(request, "appcoder/estudiantes.html")
@@ -98,3 +141,27 @@ def test(request):
     file = open(ruta)
 
     return HttpResponse(file.read())
+
+#Vistas basadas en clases
+
+class EntregablesList(ListView):
+    model = Entregable
+    template_name: str = "appcoder/list_entregables.html"
+
+class EntregablesDetail(DetailView):
+    model = Entregable
+    template_name = "appcoder/detail_entregable.html"
+
+class EntregableCreate(CreateView): #Todas las clases aceptar el atributo template_name
+    model = Entregable
+    success_url = "/coder/entregables/"
+    fields = ["nombre", "fecha_de_entrega", "entregado"]
+
+class EntregableUpdate(UpdateView):
+    model = Entregable
+    success_url = "/coder/entregables/"
+    fields = ["fecha_de_entrega", "entregado"]
+
+class EntregableDelete(DeleteView):
+    model = Entregable
+    success_url = "/coder/entregables/"

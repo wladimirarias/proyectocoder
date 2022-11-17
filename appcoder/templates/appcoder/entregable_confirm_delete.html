@@ -1,0 +1,13 @@
+{% extends 'appcoder/base.html' %} {% block contenido %}
+
+<form method="post">
+    {% csrf_token %}
+    <p>
+        Estás seguro que quieres borrar el entregable '{{ object.nombre }}'?
+        <input type="submit" value="Si">
+    </p>
+
+    <a href="{% url 'coder-entregables' %}">Volver al listado</a>
+</form>
+
+{% endblock %}
