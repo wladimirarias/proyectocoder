@@ -3,6 +3,7 @@ from appcoder.models import Curso, Profesor, Estudiante
 from appcoder.forms import ProfesorFormulario, EstudianteFormulario
 from django.shortcuts import render
 
+
 # Dependencias para resolver apertura de archivos usando rutas relativas
 from proyectocoder.settings import BASE_DIR
 import os
