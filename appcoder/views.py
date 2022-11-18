@@ -115,7 +115,51 @@ def eliminar_estudiante(request, id):
     return redirect("coder-estudiantes")
 
 def profesores(request):
-    return render(request, "appcoder/profesores.html")
+    errores = ""
+
+    if request.method == 'POST':
+        formulario = ProfesorFormulario(request.POST)
+
+        if formulario.is_valid():
+            data = formulario.cleaned_data
+            profesor = Profesor(nombre=data["nombre"], apellido=data["apellido"], email=data["email"], profesion=data["profesion"])
+            profesor.save()
+        else:
+            errores = formulario.errors
+    
+    profesores = Profesor.objects.all()
+    formulario = ProfesorFormulario()
+
+    contexto = {"listado_profesores": profesores, "formulario": formulario, "errores": errores}
+    return render(request,"appcoder/profesores.html", contexto)
+
+def editar_profesor(request, id):
+    profesor = Profesor.objects.get(id=id)
+
+    if request.method == 'POST':
+        formulario = ProfesorFormulario(request.POST)
+
+        if formulario.is_valid():
+            data = formulario.cleaned_data
+
+            profesor.nombre = data["nombre"]
+            profesor.apellido = data["apellido"]
+            profesor.email = data["email"]
+            profesor.profesion = data["profesion"]
+            profesor.save()
+            return redirect("coder-profesores")
+        else:
+            return render(request, "appcoder/editar_profesor.html", {"formulario": formulario, "errores": formulario.errors})
+    else:
+        formulario = ProfesorFormulario(initial={"nombre":profesor.nombre, "apellido":profesor.apellido, "email":profesor.email, "profesion":profesor.profesion})
+        return render(request, "appcoder/editar_profesor.html", {"formulario": formulario, "errores": ""})
+
+def eliminar_profesor(request, id):
+    profesor = Profesor.objects.get(id=id)
+    profesor.delete()
+
+    return redirect("coder-profesores")
+
 
 def creacion_profesores(request):
 
