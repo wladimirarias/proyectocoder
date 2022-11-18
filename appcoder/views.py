@@ -3,7 +3,6 @@ from appcoder.models import Curso, Profesor, Estudiante, Entregable
 from appcoder.forms import ProfesorFormulario, EstudianteFormulario, CursoFormulario
 from django.shortcuts import render, redirect
 
-
 # Dependencias para resolver apertura de archivos usando rutas relativas
 from proyectocoder.settings import BASE_DIR
 import os
@@ -70,23 +69,50 @@ def eliminar_curso(request, id):
     return redirect("coder-cursos")
 
 def estudiantes(request):
-    return render(request, "appcoder/estudiantes.html")
+    errores = ""
 
-def creacion_estudiantes(request):
-
-    if request.method == "POST":
+    if request.method == 'POST':
         formulario = EstudianteFormulario(request.POST)
-        
+
         if formulario.is_valid():
-            # Accedemos al diccionario que contiene
-            # la informacion del formulario
             data = formulario.cleaned_data
 
             estudiante = Estudiante(nombre=data["nombre"], apellido=data["apellido"], email=data["email"])
             estudiante.save()
-
+        else:
+            errores = formulario.errors
+    
+    estudiantes = Estudiante.objects.all()
     formulario = EstudianteFormulario()
-    return render(request, "appcoder/estudiantes_formulario.html", {"formulario": formulario})
+
+    contexto = {"listado_estudiantes": estudiantes, "formulario": formulario, "errores": errores}
+    return render(request, 'appcoder/estudiantes.html', contexto)
+
+def editar_estudiante(request, id):
+    estudiante = Estudiante.objects.get(id=id)
+
+    if request.method == 'POST':
+        formulario = EstudianteFormulario(request.POST)
+
+        if formulario.is_valid():
+            data = formulario.cleaned_data
+
+            estudiante.nombre = data["nombre"]
+            estudiante.apellido = data["apellido"]
+            estudiante.email = data["email"]
+            estudiante.save()
+            return redirect("coder-estudiantes")
+        else:
+            return render(request, "appcoder/editar_estudiante.html", {"formulario": formulario, "errores": formulario.errors})
+    else:
+        formulario = EstudianteFormulario(initial={"nombre":estudiante.nombre, "apellido":estudiante.apellido, "email":estudiante.email})
+        return render(request, "appcoder/editar_estudiante.html", {"formulario": formulario, "errores": ""})
+
+def eliminar_estudiante(request, id):
+    estudiante = Estudiante.objects.get(id=id)
+    estudiante.delete()
+
+    return redirect("coder-estudiantes")
 
 def profesores(request):
     return render(request, "appcoder/profesores.html")
@@ -146,7 +172,7 @@ def test(request):
 
 class EntregablesList(ListView):
     model = Entregable
-    template_name: str = "appcoder/list_entregables.html"
+    template_name = "appcoder/list_entregables.html"
 
 class EntregablesDetail(DetailView):
     model = Entregable
@@ -156,6 +182,7 @@ class EntregableCreate(CreateView): #Todas las clases aceptar el atributo templa
     model = Entregable
     success_url = "/coder/entregables/"
     fields = ["nombre", "fecha_de_entrega", "entregado"]
+    template_name = "appcoder/entregable_form.html"
 
 class EntregableUpdate(UpdateView):
     model = Entregable
