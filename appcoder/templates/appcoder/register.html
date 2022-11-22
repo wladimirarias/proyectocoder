@@ -1,0 +1,15 @@
+{% extends 'appcoder/base.html' %} {% block contenido %} {% if errors %}
+<p style="color: red;">Errores en el registro de usuario: {{ errors }}</p>
+{% endif %}
+
+<form method="post">
+
+    {% csrf_token %} {{ form.as_p }}
+
+    <input type="submit" value="Registrar Usuario">
+
+</form>
+
+<p>Ya tienes cuenta? <a href="{% url 'auth-login' %}">Inicia Sesión!</a> </p>
+
+{% endblock %}

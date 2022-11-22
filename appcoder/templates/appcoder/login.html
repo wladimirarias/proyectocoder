@@ -1,0 +1,15 @@
+{% extends 'appcoder/base.html' %} {% block contenido %} {% if errors %}
+<p style="color: red;">Errores en el inicio de sesión: {{ errors }}</p>
+{% endif %}
+
+<form method="post">
+
+    {% csrf_token %} {{ form.as_p }}
+
+    <input type="submit" value="Iniciar Sesión">
+
+</form>
+
+<p>No tienes cuenta? <a href="{% url 'auth-register' %}">Créate una</a> </p>
+
+{% endblock %}
