@@ -21,7 +21,6 @@ from django.contrib.auth.decorators import login_required
 def inicio(request):
     return render(request, "appcoder/index.html")
 
-
 @login_required
 def cursos(request):
 
@@ -71,7 +70,6 @@ def editar_curso(request, id):
     else:
         formulario = CursoFormulario(initial={"nombre":curso.nombre, "camada":curso.camada})
         return render(request, "appcoder/editar_curso.html", {"formulario": formulario, "errores": ""})
-
 
 def eliminar_curso(request, id):
     curso = Curso.objects.get(id=id)
@@ -171,7 +169,6 @@ def eliminar_profesor(request, id):
 
     return redirect("coder-profesores")
 
-
 def creacion_profesores(request):
 
     if request.method == "POST":
@@ -215,7 +212,6 @@ def buscar_alumnos(request):
 def entregables(request):
     return render(request, "appcoder/entregables.html")
 
-
 def test(request):
     ruta = os.path.join(BASE_DIR, "appcoder/templates/appcoder/base.html")
     print(BASE_DIR, __file__)
@@ -249,7 +245,6 @@ class EntregableDelete(DeleteView):
     success_url = "/coder/entregables/"
 
 #Login
-
 def iniciar_sesion(request):
 
     errors = ""
