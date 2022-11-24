@@ -1,6 +1,6 @@
 from django.http import HttpResponse
-from appcoder.models import Curso, Profesor, Estudiante, Entregable
-from appcoder.forms import ProfesorFormulario, EstudianteFormulario, CursoFormulario, UserRegisterForm
+from appcoder.models import Curso, Profesor, Estudiante, Entregable, Avatar
+from appcoder.forms import ProfesorFormulario, EstudianteFormulario, CursoFormulario, UserRegisterForm, UserEditForm, AvatarForm
 from django.shortcuts import render, redirect
 
 # Dependencias para resolver apertura de archivos usando rutas relativas
@@ -19,7 +19,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 
 def inicio(request):
-    return render(request, "appcoder/index.html")
+    if request.user.is_authenticated:
+        imagen_model = Avatar.objects.filter(user= request.user.id).order_by("-id")[0]
+        imagen_url = imagen_model.imagen.url
+    else:
+        imagen_url = ""
+    return render(request, "appcoder/index.html", {"imagen_url": imagen_url})
+
 
 @login_required
 def cursos(request):
@@ -286,3 +292,49 @@ def registrar_usuario(request):
 
     formulario = UserRegisterForm()
     return render(request, "appcoder/register.html", {"form": formulario})
+
+@login_required
+def editar_perfil(request):
+
+    usuario = request.user
+
+    if request.method == "POST":
+        # * cargar informacion en el formulario
+        formulario = UserEditForm(request.POST)
+
+        # ! validacion del formulario
+        if formulario.is_valid():
+            data = formulario.cleaned_data
+
+            # * actualizacion del usuario con los datos del formulario
+            usuario.email = data["email"]
+            usuario.first_name = data["first_name"]
+            usuario.last_name = data["last_name"]
+            usuario.save()
+
+            return redirect("coder-inicio")
+        else:
+            return render(request, "appcoder/editar_perfil.html", {"form": formulario, "errors": formulario.errors})
+    else:
+        # * crear formulario vacio
+        formulario = UserEditForm(initial={"email":usuario.email, "first_name": usuario.first_name, "last_name": usuario.last_name})
+
+    return render(request, "appcoder/editar_perfil.html", {"form": formulario})
+
+@login_required
+def agregar_avatar(request):
+
+    if request.method == 'POST':
+        formulario = AvatarForm(request.POST, request.FILES)
+
+        if formulario.is_valid():
+            data = formulario.cleaned_data
+            usuario = request.user
+            avatar = Avatar(user=usuario, imagen=data["imagen"])
+            avatar.save()
+            return redirect("coder-inicio")
+        else:
+            return render(request, "appcoder/agregar_avatar.html", {"form": formulario, "errors": formulario.errors })
+    formulario = AvatarForm()
+
+    return render(request, "appcoder/agregar_avatar.html", {"form": formulario})
