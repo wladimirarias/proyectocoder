@@ -58,6 +58,7 @@ def cursos(request):
     #Retornamos la respuesta
     return render(request, "appcoder/cursos.html", contexto)
 
+@login_required
 def editar_curso(request, id):
     curso = Curso.objects.get(id=id)
 
@@ -77,12 +78,14 @@ def editar_curso(request, id):
         formulario = CursoFormulario(initial={"nombre":curso.nombre, "camada":curso.camada})
         return render(request, "appcoder/editar_curso.html", {"formulario": formulario, "errores": ""})
 
+@login_required
 def eliminar_curso(request, id):
     curso = Curso.objects.get(id=id)
     curso.delete()
 
     return redirect("coder-cursos")
 
+@login_required
 def estudiantes(request):
     errores = ""
 
@@ -103,6 +106,7 @@ def estudiantes(request):
     contexto = {"listado_estudiantes": estudiantes, "formulario": formulario, "errores": errores}
     return render(request, 'appcoder/estudiantes.html', contexto)
 
+@login_required
 def editar_estudiante(request, id):
     estudiante = Estudiante.objects.get(id=id)
 
@@ -123,12 +127,14 @@ def editar_estudiante(request, id):
         formulario = EstudianteFormulario(initial={"nombre":estudiante.nombre, "apellido":estudiante.apellido, "email":estudiante.email})
         return render(request, "appcoder/editar_estudiante.html", {"formulario": formulario, "errores": ""})
 
+@login_required
 def eliminar_estudiante(request, id):
     estudiante = Estudiante.objects.get(id=id)
     estudiante.delete()
 
     return redirect("coder-estudiantes")
 
+@login_required
 def profesores(request):
     errores = ""
 
@@ -148,6 +154,7 @@ def profesores(request):
     contexto = {"listado_profesores": profesores, "formulario": formulario, "errores": errores}
     return render(request,"appcoder/profesores.html", contexto)
 
+@login_required
 def editar_profesor(request, id):
     profesor = Profesor.objects.get(id=id)
 
@@ -169,12 +176,14 @@ def editar_profesor(request, id):
         formulario = ProfesorFormulario(initial={"nombre":profesor.nombre, "apellido":profesor.apellido, "email":profesor.email, "profesion":profesor.profesion})
         return render(request, "appcoder/editar_profesor.html", {"formulario": formulario, "errores": ""})
 
+@login_required
 def eliminar_profesor(request, id):
     profesor = Profesor.objects.get(id=id)
     profesor.delete()
 
     return redirect("coder-profesores")
 
+@login_required
 def creacion_profesores(request):
 
     if request.method == "POST":
@@ -193,16 +202,19 @@ def creacion_profesores(request):
     contexto = {"formulario": formulario}
     return render(request, "appcoder/profesores_formularios.html", contexto)
 
+@login_required
 def buscar_curso(request):
 
     return render(request, "appcoder/busqueda_cursos.html")
 
+@login_required
 def resultados_busqueda_cursos(request):
     nombre_curso = request.GET["nombre_curso"]
 
     cursos = Curso.objects.filter(nombre__icontains=nombre_curso)
     return render(request, "appcoder/resultados_busquedas_cursos.html", {"cursos": cursos})
 
+@login_required
 def buscar_alumnos(request):
 
     if request.GET:
@@ -215,6 +227,7 @@ def buscar_alumnos(request):
 
     return render(request, "appcoder/busqueda_estudiantes.html", {"listado_alumnos": []})
 
+@login_required
 def entregables(request):
     return render(request, "appcoder/entregables.html")
 
@@ -231,22 +244,22 @@ class EntregablesList(LoginRequiredMixin, ListView):
     model = Entregable
     template_name = "appcoder/list_entregables.html"
 
-class EntregablesDetail(DetailView):
+class EntregablesDetail(LoginRequiredMixin ,DetailView):
     model = Entregable
     template_name = "appcoder/detail_entregable.html"
 
-class EntregableCreate(CreateView): #Todas las clases aceptar el atributo template_name
+class EntregableCreate(LoginRequiredMixin, CreateView): #Todas las clases aceptar el atributo template_name
     model = Entregable
     success_url = "/coder/entregables/"
     fields = ["nombre", "fecha_de_entrega", "entregado"]
     template_name = "appcoder/entregable_form.html"
 
-class EntregableUpdate(UpdateView):
+class EntregableUpdate(LoginRequiredMixin, UpdateView):
     model = Entregable
     success_url = "/coder/entregables/"
     fields = ["fecha_de_entrega", "entregado"]
 
-class EntregableDelete(DeleteView):
+class EntregableDelete(LoginRequiredMixin, DeleteView):
     model = Entregable
     success_url = "/coder/entregables/"
 

@@ -3,6 +3,7 @@ from appcoder.views import *
 from django.contrib.auth.views import LogoutView
 
 urlpatterns = [
+    #Operaciones comunes
     path("inicio/", inicio, name="coder-inicio"),
     path("estudiantes/", estudiantes, name="coder-estudiantes"),
     path("estudiantes/actualizar/<id>/", editar_estudiante, name="coder-estudiantes-editar"),
@@ -25,6 +26,7 @@ urlpatterns = [
     path("entregables/actualizar/<pk>/", EntregableUpdate.as_view(), name="coder-entregables-update"),
     path("entregables/borrar/<pk>/", EntregableDelete.as_view(), name="coder-entregables-delete"),
 
+    #Login
     path("test/", test),
     path("login/", iniciar_sesion, name="auth-login"),
     path("register/", registrar_usuario, name="auth-register"),
